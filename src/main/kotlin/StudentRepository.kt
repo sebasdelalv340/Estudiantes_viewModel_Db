@@ -1,48 +1,75 @@
 import java.sql.Connection
+import java.sql.SQLException
+import java.sql.Statement
 
 class StudentRepository: IRepo {
 
+
     override fun cargarDb(): Result<List<String>> {
-        return try {
-            val connectionDb = Database.getConnection()
+        var connectionDb: Connection? = null
+        var stmt: Statement? = null
+
+        try {
             val students = mutableListOf<String>()
-            connectionDb.use { conn ->
-                conn.createStatement().use { stmt ->
-                    stmt.executeQuery("SELECT name FROM students").use { rs ->
-                        while (rs.next()) {
-                            students.add(rs.getString("name"))
-                        }
-                    }
-                }
+            connectionDb = Database.getConnection()
+            stmt = connectionDb.createStatement()
+
+            val query = "SELECT name FROM students"
+            val resultSet = stmt.executeQuery(query)
+
+            while (resultSet.next()) {
+                students.add(resultSet.getString("name"))
             }
-            Result.success(students)
+
+            stmt.close()
+            connectionDb.close()
+
+            return Result.success(students)
+
         } catch (e: Exception) {
-            Result.failure(e)
+            stmt?.close()
+            connectionDb?.close()
+
+            return Result.failure(e)
         }
     }
 
     override fun guardarDb(students: List<String>): Result<Unit> {
         var connectionDb : Connection? = null
-        return try {
+        var stmt: Statement? = null
+        var error: Exception? = null
+
+        try {
             connectionDb = Database.getConnection()
             connectionDb.autoCommit = false
-            connectionDb.createStatement().use { stmt ->
-                stmt.execute("DELETE FROM students")
+            stmt = connectionDb.createStatement()
+            val query = "DELETE FROM students"
+            stmt.execute(query)
+
+            stmt = connectionDb.prepareStatement("INSERT INTO students (name) VALUES (?)")
+            for (student in students) {
+                stmt.setString(1, student)
+                stmt.executeUpdate()
             }
-            connectionDb.prepareStatement("INSERT INTO students (name) VALUES (?)").use { ps ->
-                for (student in students) {
-                    ps.setString(1, student)
-                    ps.executeUpdate()
-                }
-            }
+
             connectionDb.commit()
-            Result.success(Unit)
+
         } catch (e: Exception) {
-            connectionDb?.rollback()
-            Result.failure(e)
+            error = e
+            try {
+                connectionDb?.rollback()
+            } catch (e: SQLException) {
+                error = e
+            }
         } finally {
             connectionDb?.autoCommit = true
+            stmt?.close()
             connectionDb?.close()
         }
+
+        if (error != null) {
+            return Result.failure(error)
+        }
+        return Result.success(Unit)
     }
 }

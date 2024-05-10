@@ -15,7 +15,9 @@ fun main() = application {
     val gestorFichero: IFichero = Fichero()
     val ruta = "src/Estudiantes.txt"
     val file = File(ruta)
-    val viewModel = ViewModelStudent(gestorFichero, file)
+    //val viewModel = ViewModelStudent(gestorFichero, file)
+    val repo = StudentRepository()
+    val viewModel = ViewModelDb(repo)
 
     Window(onCloseRequest = ::exitApplication,
         title = "My Students",

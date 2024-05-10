@@ -12,7 +12,7 @@ class ViewModelStudent(
     private val _listaEstudiantes = mutableStateListOf<String>()
     override var listaEstudiante: MutableList<String> = _listaEstudiantes
 
-    override fun cargarFichero() {
+    override fun cargarEstudiantes() {
         val estudiantesCargados = gestorFichero.cargarFichero(fichero)
         _listaEstudiantes.addAll(estudiantesCargados)
     }

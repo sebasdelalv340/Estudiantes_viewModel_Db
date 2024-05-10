@@ -6,7 +6,7 @@ interface IViewModel {
     val nuevoEstudiante: State<String>
     val listaEstudiante: MutableList<String>
 
-    fun cargarFichero()
+    fun cargarEstudiantes()
     fun agregarStudent()
     fun borrarStudent(estudiante: String)
     fun borrarLista()

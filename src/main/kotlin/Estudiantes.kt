@@ -125,9 +125,7 @@ fun StudentScreen(
     val nuevoEstudiante by viewModel.nuevoEstudiante
     val listaEstudiantes = viewModel.listaEstudiante
 
-    LaunchedEffect(key1 = true) {
-        viewModel.cargarFichero()
-    }
+
 
     MaterialTheme {
         Column(

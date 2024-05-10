@@ -4,6 +4,7 @@ import java.sql.SQLException
 import java.sql.SQLTimeoutException
 
 
+
 object Database {
     private const val URL = "jdbc:mysql://localhost:3306/studentdb"
     private const val USER = "studentuser"
@@ -22,8 +23,8 @@ object Database {
         try {
             DriverManager.getConnection(URL, USER, PASSWORD)
         } catch (e: SQLTimeoutException) {
-            throw DatabaseTimeoutException("La conexión ha excedido el tiempo de espera permitido.")
+            throw Exception("La conexión ha excedido el tiempo de espera permitido.")
         } catch (e: SQLException) {
-            throw SqlErrorException("Error de SQL: ${e.message}")
+            throw Exception("Error de SQL: ${e.message}")
         }
 }
